@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import QuizOptions from './QuizOptions';
+import classNames from 'classnames';
 
 class Quiz extends Component {
   constructor(props) {
@@ -12,6 +13,7 @@ class Quiz extends Component {
 
     this.renderOptions = this.renderOptions.bind(this);
     this.checkResults = this.checkResults.bind(this);
+    this.play = this.play.bind(this);
   }
   randomNumber(min, max) {
     return Math.floor(Math.random() * (max-min+1)) + min;
@@ -58,9 +60,12 @@ class Quiz extends Component {
 
   console.log(riddle);
 
-  return riddle;
-
+  if (this.state && this.state.gameOver) {
+      this.setState({riddle: riddle});
+  } else {
+    return riddle;
   }
+}
 
   checkResults(option) {
     console.log('checkResults called '+option);
@@ -81,6 +86,17 @@ class Quiz extends Component {
       </div>
     );
   }
+  renderMessage() {
+    if (this.state.correct) {
+      return <h3>Good job! Hit the button below to Play Again!</h3>
+    } else {
+      return <h3>Ohhh ohhh! Hit the button below to Play Again!</h3>
+    }
+  }
+  play() {
+    this.setState({correct: false, gameOver: false});
+    this.playGame();
+  }
   render() {
     return (
       <div className="quiz">
@@ -88,10 +104,11 @@ class Quiz extends Component {
             <p className="question">What is the sum of <span className="text-info">{this.state.riddle.field1}</span> and <span className="text-info">{this.state.riddle.field2}</span>?</p>
             {this.renderOptions()}
         </div>
-        Correct: {this.state.correct ? "True" : "false"}<br/>
-        GameOver: {this.state.gameOver ? "True" : "false"}
+        <div className={classNames('after', {'hide': !this.state.gameOver}, {'wrong animated zoomInDown': !this.state.correct}, {'correct animated zoomInDown': this.state.correct})}>
+          {this.renderMessage()}
+        </div>
         <div className="play-again">
-          <a className="button">Play Again</a>
+          <a className="button" onClick={this.play}>Play Again</a>
         </div>
       </div>
     )
